@@ -69,5 +69,5 @@ npm run dev
 
 ## API Base URL
 
-Frontend uses `http://localhost:5001/api` by default. Update in `frontend/src/services/api.js` if needed.
+Frontend uses `${import.meta.env.VITE_API_URL}/api` by default. Update in `frontend/src/services/api.js` if needed.
 
