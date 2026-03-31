@@ -14,8 +14,10 @@ import { authMiddleware } from "./middleware/auth.js";
 import { startReminderScheduler } from "./services/reminderService.js";
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: "5mb" }));
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));app.use(express.json({ limit: "5mb" }));
 app.use(morgan("dev"));
 
 app.get("/api/health", (_, res) => res.json({ ok: true }));
