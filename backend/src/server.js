@@ -14,10 +14,38 @@ import { authMiddleware } from "./middleware/auth.js";
 import { startReminderScheduler } from "./services/reminderService.js";
 
 const app = express();
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));app.use(express.json({ limit: "5mb" }));
+const cleanOrigin = (value) => String(value || "").trim().replace(/\/$/, "");
+const allowedOrigins = [
+  cleanOrigin(process.env.FRONTEND_URL),
+  ...String(process.env.FRONTEND_URLS || "")
+    .split(",")
+    .map(cleanOrigin)
+]
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = cleanOrigin(origin);
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      // Optional convenience for Vercel preview/prod deployments.
+      if (normalizedOrigin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+    credentials: true
+  })
+);
+app.use(express.json({ limit: "5mb" }));
 app.use(morgan("dev"));
 
 app.get("/api/health", (_, res) => res.json({ ok: true }));
