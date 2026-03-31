@@ -14,11 +14,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signup = async (payload) => {
+  try {
     const { data } = await api.post("/auth/signup", payload);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    setUser(data.user);
-  };
+
+    console.log("Signup response:", data); // DEBUG
+
+    // ✅ Do NOT assume token/user exists
+    return data;
+
+  } catch (err) {
+    console.error("Signup error:", err);
+    throw err;
+  }
+};
 
   const updateProfile = async (payload) => {
     const { data } = await api.put("/auth/profile", payload);
